@@ -1,5 +1,5 @@
-// Remove first two arguments.
-var operands = process.argv.slice(2);
-// Sum the remaining numbers.
-var result = operands.reduce((acc, val)=>Number(acc) + Number(val), 0);
-console.log(result); // DEBUG
+// Store filesystem library.
+var fs = require('fs');
+// Read contents of file.
+var contents = fs.readFileSync(process.argv[2]);
+console.log(contents.toString().split('\n').length - 1); // DEBUG
