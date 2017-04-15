@@ -1,5 +1,18 @@
 // Store filesystem library.
 var fs = require('fs');
+// Store new line count.
+var count = undefined;
 // Read contents of file.
-var contents = fs.readFileSync(process.argv[2]);
-console.log(contents.toString().split('\n').length - 1); // DEBUG
+function readText(callback) {
+    fs.readFile(process.argv[2], function doneReading(err, fileContents) {
+        if (err) console.log("error " + err); // DEBUG
+        count = fileContents.toString().split('\n').length - 1;
+        callback();
+    })
+}
+// Output count when done.
+function logCount() {
+  console.log(count);
+}
+// Trigger read of file.
+readText(logCount);
