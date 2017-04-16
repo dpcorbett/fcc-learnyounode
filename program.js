@@ -1,18 +1,25 @@
-// Store filesystem library.
-var fs = require('fs');
-// Store new line count.
-var count = undefined;
+// Store filesystem libraries.
+const fs = require('fs');
+// Store matching files.
+var contents = undefined;
 // Read contents of file.
-function readText(callback) {
-    fs.readFile(process.argv[2], function doneReading(err, fileContents) {
+function readDir(callback) {
+    fs.readdir(process.argv[2], function doneReading(err, dirContents) {
+        // Display error.
         if (err) console.log("error " + err); // DEBUG
-        count = fileContents.toString().split('\n').length - 1;
+        // Create filter with extension supplied.
+        var extFilter = '^.*\.(' + process.argv[3] + ')$';
+        // Filter out files with matching extension.
+        contents = dirContents.filter((val) =>  val.match(extFilter), 0);
+        // Now make necessary call after directory has been read.
         callback();
-    })
+    });
 }
-// Output count when done.
-function logCount() {
-  console.log(count);
+// Output files when done.
+function logContents() {
+  for (var i = 0; i < contents.length; i++) {
+    console.log(contents[i].toString()); // DEBUG
+  }
 }
 // Trigger read of file.
-readText(logCount);
+readDir(logContents);
