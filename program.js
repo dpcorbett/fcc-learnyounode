@@ -1,11 +1,45 @@
+
 // Include custom module.
-const mymodule = require('./mymodule.js')
+//const mymodule = require('./mymodule.js')
+var http = require('http');
+
 // Call anonymous function.
-mymodule(process.argv[2], process.argv[3], logContents);
-// Output files when done.
-function logContents(err, dirContents) {
-    if (err) console.log("error " + err); // DEBUG
-    for (var i = 0; i < dirContents.length; i++) {
-        console.log(dirContents[i].toString()); // DEBUG
+//mymodule(process.argv[2], process.argv[3], logContents);
+
+http.get(process.argv[2], (res) => {
+    'use strict';
+  const  statusCode  = res.statusCode;
+  const contentType = res.headers['Content-Type'];
+  console.log(statusCode ); // DEBUG
+  console.log(res.headers); // DEBUG
+
+  let error;
+  if (statusCode !== 200) {
+    error = new Error(`Request Failed.\n` +
+                      `Status Code: ${statusCode}`);
+  } else if  (!/^application\/json/.test(contentType)) //{ 
+  {
+    error = new Error(`Invalid content-type.\n` +
+                      `Expected application/json but received ${contentType}`);
+  }
+  if (error) {
+    console.error(error.message);
+    // consume response data to free up memory
+    res.resume();
+    return;
+  }
+
+  res.setEncoding('utf8');
+  let rawData = '';
+  res.on('data', (chunk) => { rawData += chunk; });
+  res.on('end', () => {
+    try {
+      const parsedData = JSON.parse(rawData);
+      console.log(parsedData);
+    } catch (e) {
+      console.error(e.message);
     }
-}
+  });
+}).on('error', (e) => {
+  console.error(`Got error: ${e.message}`);
+});
