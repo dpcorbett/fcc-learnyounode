@@ -1,7 +1,9 @@
-// Import required library.
+// Import required libraries.
+var bl = require('bl');
 var http = require('http');
+var addr = process.argv[2];
 // Retrieve data from URL supplied.
-http.get(process.argv[2], (res) => {
+http.get(addr, (res) => {
   'use strict';
   const  statusCode  = res.statusCode;
   let error;
@@ -9,18 +11,17 @@ http.get(process.argv[2], (res) => {
     error = new Error(`Request Failed.\n` +
                       `Status Code: ${statusCode}`);
   }
-  if (error) {
-    console.error(error.message);
-    // consume response data to free up memory
-    res.resume();
-    return;
-  }
-  res.setEncoding('utf8');
-  res.on('data', (chunk) => {
-    console.log(chunk); // DEBUG
-  });
-  res.on('end', () => {
-  });
+  // Use Buffer List to read data.
+  res.pipe(bl(function (error, data) {
+    if (error) {
+      console.error(error.message);
+      // consume response data to free up memory
+      res.resume();
+      return;
+    }
+    console.log(data.length); // DEBUG
+    console.log(data.toString()); // DEBUG
+  }));
 }).on('error', (e) => {
   console.error(`Got error: ${e.message}`);
 });
