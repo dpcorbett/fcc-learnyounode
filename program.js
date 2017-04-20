@@ -1,26 +1,13 @@
-
-// Include custom module.
-//const mymodule = require('./mymodule.js')
+// Import required library.
 var http = require('http');
-
-// Call anonymous function.
-//mymodule(process.argv[2], process.argv[3], logContents);
-
+// Retrieve data from URL supplied.
 http.get(process.argv[2], (res) => {
-    'use strict';
+  'use strict';
   const  statusCode  = res.statusCode;
-  const contentType = res.headers['Content-Type'];
-  console.log(statusCode ); // DEBUG
-  console.log(res.headers); // DEBUG
-
   let error;
   if (statusCode !== 200) {
     error = new Error(`Request Failed.\n` +
                       `Status Code: ${statusCode}`);
-  } else if  (!/^application\/json/.test(contentType)) //{ 
-  {
-    error = new Error(`Invalid content-type.\n` +
-                      `Expected application/json but received ${contentType}`);
   }
   if (error) {
     console.error(error.message);
@@ -28,17 +15,11 @@ http.get(process.argv[2], (res) => {
     res.resume();
     return;
   }
-
   res.setEncoding('utf8');
-  let rawData = '';
-  res.on('data', (chunk) => { rawData += chunk; });
+  res.on('data', (chunk) => {
+    console.log(chunk); // DEBUG
+  });
   res.on('end', () => {
-    try {
-      const parsedData = JSON.parse(rawData);
-      console.log(parsedData);
-    } catch (e) {
-      console.error(e.message);
-    }
   });
 }).on('error', (e) => {
   console.error(`Got error: ${e.message}`);
