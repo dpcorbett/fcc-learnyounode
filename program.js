@@ -1,37 +1,20 @@
-var http = require('http');
-var i,j;
-var urls = process.argv.slice(2);
-var results = [];
+var net = require('net');  
+var port = process.argv[2];
+var currentTime = new Date();
+var response = '';
 
-// initialise results array
-for (i = 0; i < urls.length; i++) {
-  results[i] = null;
+var server = net.createServer(function (socket) {  
+  response = currentTime.getFullYear();
+  response += "-" + padNumber(currentTime.getMonth()+1);
+  response += "-" + padNumber(currentTime.getDate());
+  response += " " + padNumber(currentTime.getHours());
+  response += ":" + padNumber(currentTime.getMinutes());
+  console.log(response);
+  socket.end(response + "\n");
+});  
+
+var padNumber = (data) => {
+  return data < 10 ? "0" + data : data;
 }
 
-for (i = 0; i < urls.length; i++) {
-  
-  (function(i) {
-  
-    http.get(urls[i], function(request) {
-      var result = "";
-      request.setEncoding("utf8");
-      request.on("data", function(data) {
-        result += data;
-      });
-      request.on("end", function() {
-        results[i] = result;
-        var resultCount = 0;
-        for (j = 0; j < results.length; j++) {
-          if (results[j] != null) resultCount++;
-        }
-        if (resultCount == results.length) {
-          for (j = 0; j < results.length; j++) {
-            console.log(results[j]);
-          }
-        }
-      });
-    });
-	
-  })(i);
-
-}
+server.listen(port);  
