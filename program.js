@@ -1,20 +1,10 @@
-var net = require('net');  
-var port = process.argv[2];
-var currentTime = new Date();
-var response = '';
+var http = require('http');  
+const fs = require('fs');
+var args = process.argv.slice(2);
 
-var server = net.createServer(function (socket) {  
-  response = currentTime.getFullYear();
-  response += "-" + padNumber(currentTime.getMonth()+1);
-  response += "-" + padNumber(currentTime.getDate());
-  response += " " + padNumber(currentTime.getHours());
-  response += ":" + padNumber(currentTime.getMinutes());
-  console.log(response);
-  socket.end(response + "\n");
+var server = http.createServer(function (req, res) { 
+  fs.createReadStream(args[1]).pipe(res);
 });  
 
-var padNumber = (data) => {
-  return data < 10 ? "0" + data : data;
-}
 
-server.listen(port);  
+server.listen(args[0]);  
