@@ -1,9 +1,9 @@
 var http = require('http');  
-const fs = require('fs');
+var map = require('through2-map')
 var args = process.argv.slice(2);
 
 var server = http.createServer(function (req, res) { 
-  fs.createReadStream(args[1]).pipe(res);
+  req.pipe(map((chunk) => {return chunk.toString().toUpperCase()})).pipe(res);
 });  
 
 
